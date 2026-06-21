@@ -64,9 +64,10 @@ function defaultRisk(score, TOTAL_MAX, labels) {
   return levels.find(l => pct >= l.min);
 }
 
-function LineBanner({ score, totalMax }) {
+function LineBanner({ score, totalMax, subType }) {
   const lineType = getLineType(score, totalMax);
-  const url = LINE_URL + "?oatext=" + encodeURIComponent(lineType);
+  const sendText = subType ? subType.name : lineType;
+  const url = LINE_URL + "?oatext=" + encodeURIComponent(sendText);
   return (
     <a href={url} target="_blank" rel="noopener noreferrer"
       style={{ display:"block", width:"100%", maxWidth:540, background:"linear-gradient(135deg,#06c755,#00a040)", border:"2px solid #04a844", boxShadow:"4px 6px 0px #027a30", borderRadius:20, padding:"20px 22px", marginBottom:20, textDecoration:"none" }}>
@@ -86,6 +87,19 @@ function LineBanner({ score, totalMax }) {
         <div style={{ height:1, background:"#e5e7eb", margin:"12px 0" }} />
         <div style={{ fontSize:15, fontWeight:800, color:"#06c755", fontFamily:"'M PLUS Rounded 1c',sans-serif" }}>🆓 LINEで無料配布中</div>
         <div style={{ fontSize:11, color:"#9ca3af", marginTop:2, fontFamily:"'M PLUS Rounded 1c',sans-serif" }}>お友だち追加だけ・料金一切なし</div>
+        {subType && (
+          <>
+            <div style={{ height:1, background:"#e5e7eb", margin:"12px 0" }} />
+            <div style={{ background:"#f0fdf4", borderRadius:10, padding:"10px 14px" }}>
+              <div style={{ fontSize:12, color:"#15803d", fontFamily:"'M PLUS Rounded 1c',sans-serif", marginBottom:4 }}>
+                追加後にLINEへこのキーワードを送ってください
+              </div>
+              <div style={{ fontSize:20, fontWeight:900, color:"#15803d", fontFamily:"'Yomogi',cursive", lineHeight:1.3 }}>
+                {subType.emoji} {subType.name}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </a>
   );
@@ -108,11 +122,13 @@ function DaikoCTA() {
         ))}
         <div style={{ marginTop:10, fontSize:12, color:"#d1d5db", fontFamily:"'M PLUS Rounded 1c',sans-serif", lineHeight:1.7 }}>を詳しく分析します。</div>
       </div>
-      <a href={LINE_URL_DAIKO} target="_blank" rel="noopener noreferrer" style={{ display:"block", width:"100%", padding:"15px", background:"linear-gradient(135deg,#f59e0b,#ef4444)", color:"#fff", borderRadius:14, border:"none", fontSize:16, fontWeight:800, fontFamily:"'M PLUS Rounded 1c',sans-serif", boxShadow:"0 3px 0 #92400e", cursor:"pointer", textDecoration:"none", textAlign:"center" }}>🔎 プロ代行診断の内容を見てみる</a>
-      <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, marginTop:12, background:"#f3f4f6", borderRadius:10, padding:"9px 14px" }}>
-        <span style={{ fontSize:16 }}>💬</span>
-        <span style={{ fontSize:13, color:"#374151", fontWeight:700, fontFamily:"'M PLUS Rounded 1c',sans-serif" }}>LINEお友だちから <span style={{ background:"#fef9c3", padding:"1px 6px", borderRadius:4 }}>「代行」</span> と送ってください</span>
-      </div>
+      <a href={LINE_URL_DAIKO} target="_blank" rel="noopener noreferrer" style={{ display:"block", width:"100%", padding:"15px 15px 12px", background:"linear-gradient(135deg,#f59e0b,#ef4444)", borderRadius:14, border:"none", boxShadow:"0 3px 0 #92400e", cursor:"pointer", textDecoration:"none", textAlign:"center" }}>
+        <div style={{ color:"#fff", fontSize:16, fontWeight:800, fontFamily:"'M PLUS Rounded 1c',sans-serif", marginBottom:8 }}>🔎 プロ代行診断の内容を見てみる</div>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, background:"rgba(255,255,255,0.9)", borderRadius:10, padding:"8px 12px" }}>
+          <span style={{ fontSize:16 }}>💬</span>
+          <span style={{ fontSize:13, color:"#374151", fontWeight:700, fontFamily:"'M PLUS Rounded 1c',sans-serif" }}>LINEお友だちから <span style={{ background:"#fef9c3", padding:"1px 6px", borderRadius:4 }}>「代行」</span> と送ってください</span>
+        </div>
+      </a>
     </div>
   );
 }
@@ -318,7 +334,7 @@ export default function App() {
           <p style={{ fontSize:14, color:"#374151", lineHeight:1.7 }}>{risk.desc}</p>
         </div>
 
-        <LineBanner score={totalScore} totalMax={TOTAL_MAX} />
+        <LineBanner score={totalScore} totalMax={TOTAL_MAX} subType={subType} />
 
         {weakPoints.length > 0 && (
           <div style={{ ...card, marginBottom:20, border:"2.5px solid #fcd34d", boxShadow:"4px 6px 0px #fcd34d", background:"#fefce8" }}>
@@ -361,22 +377,6 @@ export default function App() {
             })}
           </div>
         </div>
-
-        {config.nextApps && (
-          <div style={{ ...card, marginBottom:20, background:"#f8fafc", border:"2.5px solid #e2e8f0", boxShadow:"4px 6px 0px #e2e8f0" }}>
-            <h3 style={{ fontFamily:"'Yomogi',cursive", fontSize:17, color:"#374151", marginBottom:14 }}>🎯 あなたにおすすめの次の診断</h3>
-            <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-              {config.nextApps.map(app=>(
-                <a key={app.url} href={app.url} target="_blank" rel="noopener noreferrer"
-                  style={{ display:"flex", alignItems:"center", gap:12, background:"#fff", border:"2px solid #e5e7eb", borderRadius:14, padding:"12px 14px", textDecoration:"none" }}>
-                  <span style={{ fontSize:24 }}>{app.emoji}</span>
-                  <span style={{ fontSize:14, fontWeight:700, color:"#374151", fontFamily:"'M PLUS Rounded 1c',sans-serif" }}>{app.label}</span>
-                  <span style={{ marginLeft:"auto", fontSize:16, color:"#9ca3af" }}>›</span>
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
 
         <DaikoCTA />
         <button onClick={restart} style={{ width:"100%", maxWidth:540, padding:"12px", background:"#fff", color:accent, borderRadius:14, border:`2px solid ${accentBorder}`, fontSize:14, fontWeight:700, fontFamily:"'M PLUS Rounded 1c',sans-serif", cursor:"pointer" }}>🔄 もう一度診断する</button>
